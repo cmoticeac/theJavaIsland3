@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/producto3_FP058_TheJavaIsland_codigoJava/lib/junit-4.13.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/producto3_FP058_TheJavaIsland_codigoJava/lib/hamcrest-core-1.3-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/producto3_FP058_TheJavaIsland_codigoJava/lib/hamcrest-core-1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/producto3_FP058_TheJavaIsland_codigoJava/lib/junit-4.13.1-javadoc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
