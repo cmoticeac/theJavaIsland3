@@ -1,6 +1,5 @@
 package Modelo.DAO;
 
-package src.Modelo.DAO;
 import Modelo.Articulo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,16 +10,17 @@ import java.util.List;
 
 public class ArticuloDAOImpl implements ArticuloDAO {
 
-    private Connection connection;
-
-    public ArticuloDAOImpl(Connection connection) {
-        this.connection = connection;
+    private Connection getConecction(){
+        return thejavaislandConnection.getConnection();
     }
+
+
 
     @Override
     public void insert(Articulo articulo) {
+        Connection conexion = getConecction();
         String query = "INSERT INTO articulos (Id, Descripcion, PrecioDeVenta, GastosDeEnvio, TiempoDePreparacion) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setString(1, articulo.getCodigo());
             preparedStatement.setString(2, articulo.getDescripcion());
             preparedStatement.setDouble(3, articulo.getPrecioDeVenta());
@@ -35,9 +35,10 @@ public class ArticuloDAOImpl implements ArticuloDAO {
 
     @Override
     public List<Articulo> readAll() {
+        Connection conexion = getConecction();
         List<Articulo> articulos = new ArrayList<>();
         String query = "SELECT * FROM articulos";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Articulo articulo = new Articulo(
@@ -56,10 +57,11 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     }
 
     @Override
-    public Articulo findById(String codigo) {
-        String query = "SELECT * FROM articulos WHERE Id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, codigo);
+    public Articulo findById(int id) {
+        Connection conexion = getConecction();
+        String query = "SELECT * FROM Articulo WHERE Id = ?";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return new Articulo(
@@ -79,8 +81,9 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     @Override
     // Método para actualizar un artículo en la base de datos
     public void update(Articulo articulo) {
+        Connection conexion = getConecction();
         String query = "UPDATE articulos SET Descripcion = ?, PrecioDeVenta = ?, GastosDeEnvio = ?, TiempoDePreparacion = ? WHERE Codigo = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setString(1, articulo.getDescripcion());
             preparedStatement.setDouble(2, articulo.getPrecioDeVenta());
             preparedStatement.setDouble(3, articulo.getGastosDeEnvio());

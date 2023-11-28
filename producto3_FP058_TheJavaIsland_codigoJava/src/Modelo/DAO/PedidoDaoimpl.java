@@ -10,18 +10,19 @@ import java.util.List;
 
 public class PedidoDAOImpl implements PedidoDAO {
 
-    private Connection connection;
-
-    public PedidoDAOImpl(Connection connection) {
-        this.connection = connection;
+    private Connection getConecction(){
+        return thejavaislandConnection.getConnection();
     }
+
+
 
     @Override
     public void insert(Pedido pedido) {
+        Connection conexion = getConecction();
         String query = "INSERT INTO Pedido (NumeroPedido, IdCliente, IdArticulo, CantidadArticulo, FechaHora, PrecioTotal, Enviado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setInt(1, pedido.getNumeroPedido());
-            preparedStatement.setInt(2, pedido.getCliente().getNif());
+            preparedStatement.setString(2, pedido.getCliente().getNif());
             preparedStatement.setString(3, pedido.getArticulo().getCodigo());
             preparedStatement.setInt(4, pedido.getCantidadArticulos());
             preparedStatement.setObject(5, pedido.getFechaHora());
@@ -36,9 +37,10 @@ public class PedidoDAOImpl implements PedidoDAO {
 
     @Override
     public List<Pedido> readAll() {
+        Connection conexion = getConecction();
         List<Pedido> pedidos = new ArrayList<>();
         String query = "SELECT * FROM Pedidos";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Pedido pedido = new Pedido(
@@ -50,7 +52,7 @@ public class PedidoDAOImpl implements PedidoDAO {
                         resultSet.getDouble("PrecioTotal"),
                         resultSet.getBoolean("Enviado")
                 );
-                pedido.getCliente().setId(resultSet.getInt("IdCliente"));
+                pedido.getCliente().setNif(resultSet.getString("NifCliente"));
                 pedido.getArticulo().setCodigo(resultSet.getString("IdArticulo"));
                 pedidos.add(pedido);
             }
@@ -62,8 +64,9 @@ public class PedidoDAOImpl implements PedidoDAO {
 
     @Override
     public Pedido findById(int numeroPedido) {
+        Connection conexion = getConecction();
         String query = "SELECT * FROM pedidos WHERE numeroPedido = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setInt(1, numeroPedido);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -76,7 +79,7 @@ public class PedidoDAOImpl implements PedidoDAO {
                         resultSet.getDouble("PrecioTotal"),
                         resultSet.getBoolean("Enviado")
                 );
-                pedido.getCliente().setNif(resultSet.getInt("Nif"));
+                pedido.getCliente().setNif(resultSet.getString("Nif"));
                 pedido.getArticulo().setCodigo(resultSet.getString("IdArticulo"));
                 return pedido;
             }
@@ -88,9 +91,10 @@ public class PedidoDAOImpl implements PedidoDAO {
 
     @Override
     public void update(Pedido pedido) {
+        Connection conexion = getConecction();
         String query = "UPDATE pedidos SET IdCliente = ?, CodigoArticulo = ?, CantidadArticulos = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE numeroPedido = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, pedido.getCliente().getNif());
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            preparedStatement.setString(1, pedido.getCliente().getNif());
             preparedStatement.setString(2, pedido.getArticulo().getCodigo());
             preparedStatement.setInt(3, pedido.getCantidadArticulos());
             preparedStatement.setObject(4, pedido.getFechaHora());

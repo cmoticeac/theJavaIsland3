@@ -1,21 +1,26 @@
 package Modelo.DAO;
 import Modelo.Cliente;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDAOImpl implements ClienteDAO {
 
-    private Connection connection;
-
-    public ClienteDAOImpl(Connection connection) {
-        this.connection = connection;
+    private Connection getConecction(){
+        return thejavaislandConnection.getConnection();
     }
+
+
 
     @Override
     public void insert(Modelo.Cliente cliente) {
+        Connection conexion = getConecction();
         String query = "INSERT INTO clientes (Nombre, Domicilio, NIF, Email, TipoCliente, CuotaMensual, Descuento) VALUES (?, ?, ?, ?,?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setString(1, cliente.getNombre());
             preparedStatement.setString(2, cliente.getDomicilio());
             preparedStatement.setString(3, cliente.getNif());
@@ -39,9 +44,10 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public List<Modelo.Cliente> readAll() {
+        Connection conexion = getConecction();
         List<Cliente> clientes = new ArrayList<>();
         String query = "SELECT * FROM clientes";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Modelo.Cliente cliente = null;
@@ -67,8 +73,9 @@ public class ClienteDAOImpl implements ClienteDAO {
     }
 
     public Modelo.Cliente findById(int id) {
+        Connection conexion = getConecction();
         String query = "SELECT * FROM clientes WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -96,13 +103,14 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public void update(Cliente cliente) {
+        Connection conexion = getConecction();
         String query = "UPDATE clientes SET nombre = ?, domicilio = ?, nif = ?, email = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setString(1, cliente.getNombre());
             preparedStatement.setString(2, cliente.getDomicilio());
             preparedStatement.setString(3, cliente.getNif());
             preparedStatement.setString(4, cliente.getEmail());
-            preparedStatement.setInt(5, cliente.getId());
+            preparedStatement.setString(5, cliente.getNif());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
