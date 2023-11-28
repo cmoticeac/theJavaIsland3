@@ -2,6 +2,7 @@ package Modelo.DAO;
 import Modelo.Pedido;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -21,8 +22,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
-            String query = "INSERT INTO Pedido (NumeroPedido, IdCliente, IdArticulo, CantidadArticulo, FechaHora, PrecioTotal, Enviado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            try (CallableStatement preparedStatement = conexion.prepareCall("{call InsertarPedido(?, ?, ?, ?, ?, ?, ?)}")) {
                 preparedStatement.setInt(1, pedido.getNumeroPedido());
                 preparedStatement.setString(2, pedido.getCliente().getNif());
                 preparedStatement.setString(3, pedido.getArticulo().getCodigo());
@@ -125,22 +125,23 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public void update(Pedido pedido) {
         Connection conexion = getConecction();
+        PreparedStatement preparedStatement = null;
         try {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
             String query = "UPDATE pedidos SET IdCliente = ?, CodigoArticulo = ?, CantidadArticulos = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE numeroPedido = ?";
-            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-                preparedStatement.setString(1, pedido.getCliente().getNif());
-                preparedStatement.setString(2, pedido.getArticulo().getCodigo());
-                preparedStatement.setInt(3, pedido.getCantidadArticulos());
-                preparedStatement.setObject(4, pedido.getFechaHora());
-                preparedStatement.setDouble(5, pedido.getPrecioTotal());
-                preparedStatement.setBoolean(6, pedido.getEnviado());
-                preparedStatement.setInt(7, pedido.getNumeroPedido());
+            preparedStatement = conexion.prepareStatement(query);
 
-                preparedStatement.executeUpdate();
-            }
+            preparedStatement.setString(1, pedido.getCliente().getNif());
+            preparedStatement.setString(2, pedido.getArticulo().getCodigo());
+            preparedStatement.setInt(3, pedido.getCantidadArticulos());
+            preparedStatement.setObject(4, pedido.getFechaHora());
+            preparedStatement.setDouble(5, pedido.getPrecioTotal());
+            preparedStatement.setBoolean(6, pedido.getEnviado());
+            preparedStatement.setInt(7, pedido.getNumeroPedido());
+
+            preparedStatement.executeUpdate();
 
             // Confirmar la transacción si todo está bien
             conexion.commit();
@@ -155,6 +156,14 @@ public class PedidoDAOImpl implements PedidoDAO {
             }
             e.printStackTrace(); // Manejo básico de errores. Puedes personalizar esto según tus necesidades.
         } finally {
+            // Cerrar PreparedStatement
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
             // Restaurar el modo de autocommit al final de la operación
             try {
                 if (conexion != null) {

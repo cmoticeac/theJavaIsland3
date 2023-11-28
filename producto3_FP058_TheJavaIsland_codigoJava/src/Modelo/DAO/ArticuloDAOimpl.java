@@ -1,10 +1,8 @@
 package Modelo.DAO;
 
 import Modelo.Articulo;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,23 +17,17 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     @Override
     public void insert(Articulo articulo) {
         Connection conexion = getConecction();
-        try {
-            // Iniciar la transacción
-            conexion.setAutoCommit(false);
+        // ...
+        String call = "{CALL InsertarArticulo(?, ?, ?, ?, ?)}";
+        try (CallableStatement callableStatement = conexion.prepareCall(call)) {
+            callableStatement.setString(1, articulo.getCodigo());
+            callableStatement.setString(2, articulo.getDescripcion());
+            callableStatement.setDouble(3, articulo.getPrecioDeVenta());
+            callableStatement.setDouble(4, articulo.getGastosDeEnvio());
+            callableStatement.setDouble(5, articulo.getTiempoDePreparacion());
 
-            String query = "INSERT INTO articulos (Id, Descripcion, PrecioDeVenta, GastosDeEnvio, TiempoDePreparacion) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-                preparedStatement.setString(1, articulo.getCodigo());
-                preparedStatement.setString(2, articulo.getDescripcion());
-                preparedStatement.setDouble(3, articulo.getPrecioDeVenta());
-                preparedStatement.setDouble(4, articulo.getGastosDeEnvio());
-                preparedStatement.setDouble(5, articulo.getTiempoDePreparacion());
-
-                preparedStatement.executeUpdate();
-            }
-
-            // Confirmar la transacción si todo está bien
-            conexion.commit();
+            // Ejecutar la llamada al procedimiento almacenado
+            callableStatement.execute();
         } catch (SQLException e) {
             // Revertir la transacción en caso de error
             try {

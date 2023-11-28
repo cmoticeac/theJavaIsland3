@@ -3,6 +3,7 @@ import Modelo.Cliente;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,26 +22,26 @@ public class ClienteDAOImpl implements ClienteDAO {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
-            String query = "INSERT INTO clientes (Nombre, Domicilio, NIF, Email, TipoCliente, CuotaMensual, Descuento) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-                preparedStatement.setString(1, cliente.getNombre());
-                preparedStatement.setString(2, cliente.getDomicilio());
-                preparedStatement.setString(3, cliente.getNif());
-                preparedStatement.setString(4, cliente.getEmail());
+            String callProcedure = "{call InsertCliente(?, ?, ?, ?, ?, ?, ?)}";
+            try (CallableStatement callableStatement = conexion.prepareCall(callProcedure)) {
+                callableStatement.setString(1, cliente.getNombre());
+                callableStatement.setString(2, cliente.getDomicilio());
+                callableStatement.setString(3, cliente.getNif());
+                callableStatement.setString(4, cliente.getEmail());
 
                 // Verificar si es ClientePremium
                 if (cliente instanceof Modelo.ClientePremium) {
                     Modelo.ClientePremium cp = (Modelo.ClientePremium) cliente;
-                    preparedStatement.setBoolean(5, true);
-                    preparedStatement.setDouble(6, cp.getCuota());
-                    preparedStatement.setDouble(7, cp.getDescuentoEnvio());
+                    callableStatement.setBoolean(5, true);
+                    callableStatement.setDouble(6, cp.getCuota());
+                    callableStatement.setDouble(7, cp.getDescuentoEnvio());
                 } else {
-                    preparedStatement.setBoolean(5, false);
-                    preparedStatement.setNull(6, java.sql.Types.DOUBLE);
-                    preparedStatement.setNull(7, java.sql.Types.DOUBLE);
+                    callableStatement.setBoolean(5, false);
+                    callableStatement.setNull(6, java.sql.Types.DOUBLE);
+                    callableStatement.setNull(7, java.sql.Types.DOUBLE);
                 }
 
-                preparedStatement.executeUpdate();
+                callableStatement.executeUpdate();
             }
 
             // Confirmar la transacción si todo está bien
@@ -75,7 +76,6 @@ public class ClienteDAOImpl implements ClienteDAO {
             }
         }
     }
-
 
     @Override
     public List<Modelo.Cliente> readAll() {
