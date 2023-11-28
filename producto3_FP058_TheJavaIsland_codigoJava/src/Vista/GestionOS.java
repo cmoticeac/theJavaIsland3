@@ -366,19 +366,8 @@ public class GestionOS {
                 "(Recuerda que solo podras eliminar pedidos PENDIENTES DE ENVIO!)\n");
 
         int codigo = teclado.nextInt();
-
-        for (int i = 0 ; i < controlador.datos.getListaPedidos().getSize();i++){
-
-            if(codigo == controlador.datos.getListaPedidos().getAt(i).getNumeroPedido()){
-                if( controlador.datos.getListaPedidos().getAt(i).getEnviado()){
-                    System.out.println("Siento comunicarles que el pedido ya ha sido ENVIADO.");
-                    break;
-                }else{
-                    controlador.datos.getListaPedidos().borrar(controlador.datos.getListaPedidos().getAt(i));
-                    System.out.println("El pedido "+codigo+" ha sido eliminado.");
-                }
-            }
-        }
+        if (controlador.eliminarPedido(codigo)) System.out.println("Pedido " +codigo+ " borrado con exito!");
+        else System.out.println("El pedido no se ha podio borrar. El codigo introducido no existe o el pedido ya ha sido enviado");
     }
 
     //Metodo para mostrar los pedidos aun por enviar
@@ -386,13 +375,9 @@ public class GestionOS {
         controlador.actualizarEnvios();
         System.out.println("\nLista de los pedidos PENDIENTES de envio:\n");
         System.out.println("-----------------------------------------------");
-        for (int i = 0; i < controlador.datos.getListaPedidos().getSize(); i++) {
-            if (!controlador.datos.getListaPedidos().getAt(i).getEnviado()) {
-                System.out.println(controlador.datos.getListaPedidos().getAt(i).toString());
-            }
+        System.out.println(controlador.obtenerPedidosPendientes());
             System.out.println("-----------------------------------------------");
         }
-    }
 
 
     //Metodo para mostrar los pedidos enviados
@@ -400,14 +385,11 @@ public class GestionOS {
         controlador.actualizarEnvios();
         System.out.println("\nLista de los pedidos ENVIADOS:\n");
         System.out.println("-----------------------------------------------");
-        for (int i = 0 ; i<controlador.datos.getListaPedidos().getSize();i++){
-            if (controlador.datos.getListaPedidos().getAt(i).getEnviado()) {
-                System.out.println(controlador.datos.getListaPedidos().getAt(i).toString());
-            }
+        System.out.println(controlador.obtenerPediosEnviados());
             System.out.println("-----------------------------------------------");
         }
-    }
 }
+
 
 
 

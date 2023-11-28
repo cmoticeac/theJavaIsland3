@@ -104,4 +104,37 @@ public class Controlador {
     public void añadirPedido(Pedido pedido){
         this.datos.getListaPedidos().add(pedido);
     }
+
+    //false => no se ha podido borrar
+    //true => borrado
+    public Boolean eliminarPedido(int codigo){
+        for (Pedido p: this.datos.getListaPedidos().getLista()){
+            if(p.getNumeroPedido() == codigo){
+                if(p.getEnviado()){
+                    return false;
+                }
+                else{
+                    this.datos.getListaPedidos().borrar(p);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String obtenerPedidosPendientes(){
+        String pedidos = new String();
+        for (Pedido p:this.datos.getListaPedidos().getLista()){
+            if(p.getEnviado() == false) pedidos += p.getNumeroPedido() + " " + p.getPrecioTotal() + "\n";
+        }
+        return pedidos;
+    }
+
+    public String obtenerPediosEnviados(){
+        String pedidos = new String();
+        for (Pedido p:this.datos.getListaPedidos().getLista()){
+            if(p.getEnviado()) pedidos += p.getNumeroPedido() + " " + p.getPrecioTotal() + "\n";
+        }
+        return pedidos;
+    }
 }
