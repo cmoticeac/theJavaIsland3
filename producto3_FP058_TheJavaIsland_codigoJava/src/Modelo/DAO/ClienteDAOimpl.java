@@ -14,33 +14,68 @@ public class ClienteDAOImpl implements ClienteDAO {
         return thejavaislandConnection.getConnection();
     }
 
-
-
     @Override
     public void insert(Modelo.Cliente cliente) {
         Connection conexion = getConecction();
-        String query = "INSERT INTO clientes (Nombre, Domicilio, NIF, Email, TipoCliente, CuotaMensual, Descuento) VALUES (?, ?, ?, ?,?, ?)";
-        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-            preparedStatement.setString(1, cliente.getNombre());
-            preparedStatement.setString(2, cliente.getDomicilio());
-            preparedStatement.setString(3, cliente.getNif());
-            preparedStatement.setString(4, cliente.getEmail());
-            if (cliente instanceof Modelo.ClientePremium){
-                Modelo.ClientePremium cp = (Modelo.ClientePremium) cliente;
-                preparedStatement.setBoolean(5, true);
-                preparedStatement.setDouble(6, cp.getCuota());
-                preparedStatement.setDouble(7, cp.getDescuentoEnvio());
+        try {
+            // Iniciar la transacción
+            conexion.setAutoCommit(false);
+
+            String query = "INSERT INTO clientes (Nombre, Domicilio, NIF, Email, TipoCliente, CuotaMensual, Descuento) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+                preparedStatement.setString(1, cliente.getNombre());
+                preparedStatement.setString(2, cliente.getDomicilio());
+                preparedStatement.setString(3, cliente.getNif());
+                preparedStatement.setString(4, cliente.getEmail());
+
+                // Verificar si es ClientePremium
+                if (cliente instanceof Modelo.ClientePremium) {
+                    Modelo.ClientePremium cp = (Modelo.ClientePremium) cliente;
+                    preparedStatement.setBoolean(5, true);
+                    preparedStatement.setDouble(6, cp.getCuota());
+                    preparedStatement.setDouble(7, cp.getDescuentoEnvio());
+                } else {
+                    preparedStatement.setBoolean(5, false);
+                    preparedStatement.setNull(6, java.sql.Types.DOUBLE);
+                    preparedStatement.setNull(7, java.sql.Types.DOUBLE);
+                }
+
+                preparedStatement.executeUpdate();
             }
-            else{
-                preparedStatement.setBoolean(5, false);
-                preparedStatement.setString(6, null);
-                preparedStatement.setString(7, null);
-            }
-            preparedStatement.executeUpdate();
+
+            // Confirmar la transacción si todo está bien
+            conexion.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Revertir la transacción en caso de error
+            try {
+                if (conexion != null) {
+                    conexion.rollback();
+                }
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+            e.printStackTrace(); // Manejo básico de errores. Puedes personalizar esto según tus necesidades.
+        } finally {
+            // Restaurar el modo de autocommit al final de la operación
+            try {
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
+                }
+            } catch (SQLException autoCommitException) {
+                autoCommitException.printStackTrace();
+            }
+
+            // Cerrar la conexión
+            try {
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException closeException) {
+                closeException.printStackTrace();
+            }
         }
     }
+
 
     @Override
     public List<Modelo.Cliente> readAll() {
@@ -104,16 +139,52 @@ public class ClienteDAOImpl implements ClienteDAO {
     @Override
     public void update(Cliente cliente) {
         Connection conexion = getConecction();
-        String query = "UPDATE clientes SET nombre = ?, domicilio = ?, nif = ?, email = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-            preparedStatement.setString(1, cliente.getNombre());
-            preparedStatement.setString(2, cliente.getDomicilio());
-            preparedStatement.setString(3, cliente.getNif());
-            preparedStatement.setString(4, cliente.getEmail());
-            preparedStatement.setString(5, cliente.getNif());
-            preparedStatement.executeUpdate();
+        try {
+            // Iniciar la transacción
+            conexion.setAutoCommit(false);
+
+            String query = "UPDATE clientes SET nombre = ?, domicilio = ?, nif = ?, email = ? WHERE id = ?";
+            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+                preparedStatement.setString(1, cliente.getNombre());
+                preparedStatement.setString(2, cliente.getDomicilio());
+                preparedStatement.setString(3, cliente.getNif());
+                preparedStatement.setString(4, cliente.getEmail());
+                preparedStatement.setString(5, cliente.getNif());
+
+                preparedStatement.executeUpdate();
+            }
+
+            // Confirmar la transacción si todo está bien
+            conexion.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Revertir la transacción en caso de error
+            try {
+                if (conexion != null) {
+                    conexion.rollback();
+                }
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+            e.printStackTrace(); // Manejo básico de errores. Puedes personalizar esto según tus necesidades.
+        } finally {
+            // Restaurar el modo de autocommit al final de la operación
+            try {
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
+                }
+            } catch (SQLException autoCommitException) {
+                autoCommitException.printStackTrace();
+            }
+
+            // Cerrar la conexión
+            try {
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException closeException) {
+                closeException.printStackTrace();
+            }
         }
     }
+
 }

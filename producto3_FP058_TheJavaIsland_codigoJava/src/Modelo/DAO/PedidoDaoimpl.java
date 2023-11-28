@@ -14,26 +14,59 @@ public class PedidoDAOImpl implements PedidoDAO {
         return thejavaislandConnection.getConnection();
     }
 
-
-
     @Override
     public void insert(Pedido pedido) {
         Connection conexion = getConecction();
-        String query = "INSERT INTO Pedido (NumeroPedido, IdCliente, IdArticulo, CantidadArticulo, FechaHora, PrecioTotal, Enviado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-            preparedStatement.setInt(1, pedido.getNumeroPedido());
-            preparedStatement.setString(2, pedido.getCliente().getNif());
-            preparedStatement.setString(3, pedido.getArticulo().getCodigo());
-            preparedStatement.setInt(4, pedido.getCantidadArticulos());
-            preparedStatement.setObject(5, pedido.getFechaHora());
-            preparedStatement.setDouble(6, pedido.getPrecioTotal());
-            preparedStatement.setBoolean(7, pedido.getEnviado());
+        try {
+            // Iniciar la transacción
+            conexion.setAutoCommit(false);
 
-            preparedStatement.executeUpdate();
+            String query = "INSERT INTO Pedido (NumeroPedido, IdCliente, IdArticulo, CantidadArticulo, FechaHora, PrecioTotal, Enviado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+                preparedStatement.setInt(1, pedido.getNumeroPedido());
+                preparedStatement.setString(2, pedido.getCliente().getNif());
+                preparedStatement.setString(3, pedido.getArticulo().getCodigo());
+                preparedStatement.setInt(4, pedido.getCantidadArticulos());
+                preparedStatement.setObject(5, pedido.getFechaHora());
+                preparedStatement.setDouble(6, pedido.getPrecioTotal());
+                preparedStatement.setBoolean(7, pedido.getEnviado());
+
+                preparedStatement.executeUpdate();
+            }
+
+            // Confirmar la transacción si todo está bien
+            conexion.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Revertir la transacción en caso de error
+            try {
+                if (conexion != null) {
+                    conexion.rollback();
+                }
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+            e.printStackTrace(); // Manejo básico de errores. Puedes personalizar esto según tus necesidades.
+        } finally {
+            // Restaurar el modo de autocommit al final de la operación
+            try {
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
+                }
+            } catch (SQLException autoCommitException) {
+                autoCommitException.printStackTrace();
+            }
+
+            // Cerrar la conexión
+            try {
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException closeException) {
+                closeException.printStackTrace();
+            }
         }
     }
+
 
     @Override
     public List<Pedido> readAll() {
@@ -92,19 +125,53 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public void update(Pedido pedido) {
         Connection conexion = getConecction();
-        String query = "UPDATE pedidos SET IdCliente = ?, CodigoArticulo = ?, CantidadArticulos = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE numeroPedido = ?";
-        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-            preparedStatement.setString(1, pedido.getCliente().getNif());
-            preparedStatement.setString(2, pedido.getArticulo().getCodigo());
-            preparedStatement.setInt(3, pedido.getCantidadArticulos());
-            preparedStatement.setObject(4, pedido.getFechaHora());
-            preparedStatement.setDouble(5, pedido.getPrecioTotal());
-            preparedStatement.setBoolean(6, pedido.getEnviado());
-            preparedStatement.setInt(7, pedido.getNumeroPedido());
+        try {
+            // Iniciar la transacción
+            conexion.setAutoCommit(false);
 
-            preparedStatement.executeUpdate();
+            String query = "UPDATE pedidos SET IdCliente = ?, CodigoArticulo = ?, CantidadArticulos = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE numeroPedido = ?";
+            try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+                preparedStatement.setString(1, pedido.getCliente().getNif());
+                preparedStatement.setString(2, pedido.getArticulo().getCodigo());
+                preparedStatement.setInt(3, pedido.getCantidadArticulos());
+                preparedStatement.setObject(4, pedido.getFechaHora());
+                preparedStatement.setDouble(5, pedido.getPrecioTotal());
+                preparedStatement.setBoolean(6, pedido.getEnviado());
+                preparedStatement.setInt(7, pedido.getNumeroPedido());
+
+                preparedStatement.executeUpdate();
+            }
+
+            // Confirmar la transacción si todo está bien
+            conexion.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Revertir la transacción en caso de error
+            try {
+                if (conexion != null) {
+                    conexion.rollback();
+                }
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+            e.printStackTrace(); // Manejo básico de errores. Puedes personalizar esto según tus necesidades.
+        } finally {
+            // Restaurar el modo de autocommit al final de la operación
+            try {
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
+                }
+            } catch (SQLException autoCommitException) {
+                autoCommitException.printStackTrace();
+            }
+
+            // Cerrar la conexión
+            try {
+                if (conexion != null) {
+                    conexion.close();
+                }
+            } catch (SQLException closeException) {
+                closeException.printStackTrace();
+            }
         }
     }
 }

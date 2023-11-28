@@ -1,9 +1,11 @@
 package Modelo.DAO;
 
-public interface FactoryDAOImpl<T, R>{
-    public void insert(T o);
-    public ArrayList<T> list();
-    public void update(T, o);
-    public void delete(T o);
-    public T read(R o);
+import java.util.List;
+
+public interface FactoryDAOImpl<T, R> {
+    void insert(T entity);
+    List<T> list();
+    void update(T entity);
+    void delete(T entity);
+    T read(R id);
 }
