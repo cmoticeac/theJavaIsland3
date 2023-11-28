@@ -153,7 +153,6 @@ public class Pedido {
                 return false;
             }
         } catch (ParseException e) {
-            System.out.println("El calculo de pedidoEnviado() en pedidos, ha fallado.");
             e.printStackTrace();
         }
         return true;  //si hay algun error, el pedido no se devolvera ya que saldra como enviado.

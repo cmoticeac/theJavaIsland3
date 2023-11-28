@@ -95,7 +95,7 @@ public class GestionOS {
         tiempos =teclado.nextInt();
         //Creamos un articulo con los datos recogidos y los guardamos gracias al controlador.
         Articulo articulo = new Articulo(codigos,descripciones, precios, envios,tiempos);
-        controlador.datos.getListaArticulos().add(articulo);
+        controlador.añadirArticulo(articulo);
     }
 
 
@@ -104,27 +104,25 @@ public class GestionOS {
     public void MostrarArticulo() {
         //Bucle para imprimir codigo + descripcion de todos los articulos
         System.out.println("====================Listado de Articulos Disponibles======================");
-        for (Articulo articulo: controlador.datos.getListaArticulos().getLista()){
-            System.out.println(articulo.getCodigo() + " " + articulo.getDescripcion());
-        }
+        System.out.println(controlador.imprimirArticulos());
         //Preguntamos por el codigo del articulo que interesa
         System.out.println("==========================================================================\n");
         System.out.print("Introduce el codigo del articulo que deseas mostrar:\n");
         String codigoIngresado = teclado.next();
         //Lo buscamos en la lista a través del controlador
-        for (int i = 0; i < controlador.datos.getListaArticulos().getSize(); i++) {
-            if (codigoIngresado.equals(controlador.datos.getListaArticulos().getAt(i).getCodigo())) {
-                //Si lo encontramos imprimimos toda su información.
-                System.out.println("articulos codigo=" + controlador.datos.getListaArticulos().getAt(i).getCodigo() + "\n" +
-                        "descripcion=" + controlador.datos.getListaArticulos().getAt(i).getDescripcion() + "\n" +
-                        "precioDeVenta=" + controlador.datos.getListaArticulos().getAt(i).getPrecioDeVenta() + "\n" +
-                        "gastosDeEnvio=" + controlador.datos.getListaArticulos().getAt(i).getGastosDeEnvio() + "\n" +
-                        "tiempoDePreparacion=" + controlador.datos.getListaArticulos().getAt(i).getTiempoDePreparacion() + "\n");
-                return;
-            }
+        Articulo artSelec = controlador.obtenerArticuloCodigo(codigoIngresado);
+        if(artSelec != null){
+            System.out.println("articulos codigo=" + artSelec.getCodigo() + "\n" +
+                    "descripcion=" + artSelec.getDescripcion() + "\n" +
+                    "precioDeVenta=" + artSelec.getPrecioDeVenta() + "\n" +
+                    "gastosDeEnvio=" + artSelec.getGastosDeEnvio() + "\n" +
+                    "tiempoDePreparacion=" + artSelec.getTiempoDePreparacion() + "\n");
         }
-        //En caso contrario informamos al usuario
-        System.out.println("No existe ningún articulo con el código que has introducido.");
+
+        else{
+            //En caso contrario informamos al usuario
+            System.out.println("No existe ningún articulo con el código que has introducido.");
+        }
     }
 
     public void menuCliente() {
@@ -155,12 +153,10 @@ public class GestionOS {
         System.out.print("Introduce el NIF: ");
         String nif = teclado.nextLine();
         //Como lo usamos como identificador, primero comprobaremos que no haya sido usado
-        for(int i = 0;i < controlador.datos.getListaClientes().getSize(); ++i){
-            if(controlador.datos.getListaClientes().getAt(i).getNif().equals(nif)){
-                //Si existe informamos del error y terminamos la funcion
-                System.out.println("\n¡Este cliente ya está registrado!");
-                return;
-            }
+        while (controlador.clienteExistente(nif) == true){
+            System.out.println("\n¡Este cliente ya está registrado!");
+            System.out.print("Introduce el NIF: ");
+            nif = teclado.nextLine();
         }
         //Seguimos recogiendo datos
         System.out.print("Introduce el nombre del nuevo cliente: ");
@@ -181,13 +177,13 @@ public class GestionOS {
                 double descuento = teclado.nextDouble();
                 //Creamos un nuevo cliente premium y lo añadimos a través del controlador
                 ClientePremium c1 = new ClientePremium(nombre, addres, nif, mail, cuota, descuento);
-                controlador.datos.getListaClientes().add(c1);
+                controlador.añadirCliente(c1);
                 System.out.println("\nEl cliente se registro correctamente.\n");
             }
             case 2 -> {
                 //Si es estandar, crearemos el cliente y lo guardaremos
                 ClienteEstandar c2 = new ClienteEstandar(nombre, addres, nif, mail);
-                controlador.datos.getListaClientes().add(c2);
+                controlador.añadirCliente(c2);
                 System.out.println("\nEl cliente se registro correctamente.\n");
             }
             default -> System.out.print("\nDebes introducir un número: ");
@@ -198,9 +194,7 @@ public class GestionOS {
     public void imprimirListaClientes(){
         //Obtiene la lista de clientes y hace un foreach para imprimirlos todos
         System.out.println("=====================Listado de Clientes registrados========================\n");
-        for(Cliente cliente: controlador.datos.getListaClientes().getLista()){
-            System.out.println(cliente.getNif() + " " + cliente.getNombre());
-        }
+        System.out.println(controlador.imprimirClientes());
     }
 
     //Imprime los clientes premium
@@ -208,23 +202,15 @@ public class GestionOS {
         //Uilizamos un foreach en la lista completa de Clientes,
         //pero utilizamos intanceof para saber si es premium
         System.out.println("=====Clientes Premium=====");
-        for(Cliente cliente: controlador.datos.getListaClientes().getLista()){
-            if(cliente instanceof ClientePremium){
-                System.out.println(cliente.getNif() + " " + cliente.getNombre());
-            }
-        }
+        System.out.println(controlador.imprimirClientesPremium());
     }
 
     //Imprime los clientes estandar
     public void imprimirListaClientesEstandar(){
         //Uilizamos un foreach en la lista completa de Clientes,
-        //pero utilizamos intanceof para saber si es estandar
+        //pero utilizamos intanceof para saber si es premium
         System.out.println("=====Clientes Estandar=====");
-        for(Cliente cliente: controlador.datos.getListaClientes().getLista()){
-            if(cliente instanceof ClienteEstandar){
-                System.out.println(cliente.getNif() + " " + cliente.getNombre());
-            }
-        }
+        System.out.println(controlador.imprimirClientesEstandar());
     }
 
     public void menuPedidos() {   //menu de pedidos
@@ -289,11 +275,7 @@ public class GestionOS {
             Scanner input2 = new Scanner(System.in);
             String nif = input2.nextLine();
             //cliente registrado
-            for (int i = 0;i < controlador.datos.getListaClientes().getSize(); ++i ){
-                if(controlador.datos.getListaClientes().getAt(i).getNif().equals(nif)){
-                    pedido.setCliente(controlador.datos.getListaClientes().getAt(i));
-                }
-            }
+            pedido.setCliente(controlador.conseguirClienteNif(nif));
             //Añadir manejo de errores nif introducido incorrecto
         }else if(opcion == 2){
             //Si no existe, creamos un nuevo cliente
@@ -320,7 +302,7 @@ public class GestionOS {
                         System.out.println("introduce un correo electronico");
                         String mail= teclado.nextLine();
                         ClienteEstandar cE= new ClienteEstandar(Nif, name, Addres, mail);
-                        controlador.datos.getListaClientes().add(cE);
+                        controlador.añadirCliente(cE);
                         pedido.setCliente(cE);
                         System.out.println("Cliente standar añadido.");
                         teclado.nextLine();
@@ -341,7 +323,7 @@ public class GestionOS {
                         System.out.println("introduce el porcentage de descuento");
                         double porDes= teclado.nextDouble();
                         ClientePremium cP= new ClientePremium(nif, Name, dir, email, quotaCliente, porDes);
-                        controlador.datos.getListaClientes().add(cP);
+                        controlador.añadirCliente(cP);
                         pedido.setCliente(cP);
                         System.out.println("Cliente premium añadido.");
                         salir=true;
@@ -355,21 +337,13 @@ public class GestionOS {
 
         //Imprimimos todos los artículos
         System.out.println("====================Listado de Articulos Disponibles======================");
-        for (int i = 0; i < controlador.datos.getListaArticulos().getSize(); i++) {
-            System.out.println(controlador.datos.getListaArticulos().getAt(i).getCodigo() + " " + controlador.datos.getListaArticulos().getAt(i).getDescripcion());
-        }
+        System.out.println(controlador.imprimirArticulos());
         System.out.println("==========================================================================\n");
 
         //Preguntamos el codigo del articulo que nos interessa y lo buscamos en listaArticulos
         System.out.println("Introduce el codigo del articulo para añadirlo al pedido: ");
         String codigo = teclado.nextLine();
-
-        for (int i = 0; i < controlador.datos.getListaArticulos().getSize(); i++) {
-            if (codigo.equals(controlador.datos.getListaArticulos().getAt(i).getCodigo())) {
-                pedido.setArticulo(controlador.datos.getListaArticulos().getAt(i));                                                     //articulo escogido
-            }
-        }
-
+        if(controlador.obtenerArticuloCodigo(codigo) != null) pedido.setArticulo(controlador.obtenerArticuloCodigo(codigo));
         //Preguntamos cuantas unidades del artículo quiere el cliente
 
         System.out.println("Introduce la cantidad de articulos: ");
@@ -381,7 +355,7 @@ public class GestionOS {
         LocalDateTime horaActual= LocalDateTime.now();
         pedido.setFechaHora(horaActual);
         pedido.setEnviado(false);
-        controlador.datos.getListaPedidos().add(pedido);
+        controlador.añadirPedido(pedido);
     }
 
     //Metodo para eliminar pedidos que aun no han sido enviados
@@ -392,19 +366,8 @@ public class GestionOS {
                 "(Recuerda que solo podras eliminar pedidos PENDIENTES DE ENVIO!)\n");
 
         int codigo = teclado.nextInt();
-
-        for (int i = 0 ; i < controlador.datos.getListaPedidos().getSize();i++){
-
-            if(codigo == controlador.datos.getListaPedidos().getAt(i).getNumeroPedido()){
-                if( controlador.datos.getListaPedidos().getAt(i).getEnviado()){
-                    System.out.println("Siento comunicarles que el pedido ya ha sido ENVIADO.");
-                    break;
-                }else{
-                    controlador.datos.getListaPedidos().borrar(controlador.datos.getListaPedidos().getAt(i));
-                    System.out.println("El pedido "+codigo+" ha sido eliminado.");
-                }
-            }
-        }
+        if (controlador.eliminarPedido(codigo)) System.out.println("Pedido " +codigo+ " borrado con exito!");
+        else System.out.println("El pedido no se ha podio borrar. El codigo introducido no existe o el pedido ya ha sido enviado");
     }
 
     //Metodo para mostrar los pedidos aun por enviar
@@ -412,13 +375,9 @@ public class GestionOS {
         controlador.actualizarEnvios();
         System.out.println("\nLista de los pedidos PENDIENTES de envio:\n");
         System.out.println("-----------------------------------------------");
-        for (int i = 0; i < controlador.datos.getListaPedidos().getSize(); i++) {
-            if (!controlador.datos.getListaPedidos().getAt(i).getEnviado()) {
-                System.out.println(controlador.datos.getListaPedidos().getAt(i).toString());
-            }
+        System.out.println(controlador.obtenerPedidosPendientes());
             System.out.println("-----------------------------------------------");
         }
-    }
 
 
     //Metodo para mostrar los pedidos enviados
@@ -426,14 +385,11 @@ public class GestionOS {
         controlador.actualizarEnvios();
         System.out.println("\nLista de los pedidos ENVIADOS:\n");
         System.out.println("-----------------------------------------------");
-        for (int i = 0 ; i<controlador.datos.getListaPedidos().getSize();i++){
-            if (controlador.datos.getListaPedidos().getAt(i).getEnviado()) {
-                System.out.println(controlador.datos.getListaPedidos().getAt(i).toString());
-            }
+        System.out.println(controlador.obtenerPediosEnviados());
             System.out.println("-----------------------------------------------");
         }
-    }
 }
+
 
 
 

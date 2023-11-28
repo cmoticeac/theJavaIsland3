@@ -44,7 +44,6 @@ public class Lista<T> {
                 return;
             }
         }
-        System.out.println("No existe el objeto en la lista");
     }
 
     public T getAt(int posicion){
