@@ -6,6 +6,7 @@ package Modelo;
 public class Articulo {
 
     /** Atributos de la clase */
+    private int id;
     private String codigo;
     private String Descripcion;
     private double precioDeVenta;

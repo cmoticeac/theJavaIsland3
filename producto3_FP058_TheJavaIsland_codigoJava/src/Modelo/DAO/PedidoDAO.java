@@ -1,6 +1,5 @@
 package Modelo.DAO;
 
-package src.Modelo.DAO;
 
 import Modelo.Pedido;
 

@@ -6,11 +6,11 @@ public class ClienteEstandar extends Cliente{
         super(n, d, nif, m);
     }
 
-    public void ToString(){
-        System.out.println("Cliente Estandar"
+    public String ToString(){
+        return "Cliente Estandar"
                 + "\nNombre: " + this.getNombre()
                 + "\nDireccion: " + this.getDomicilio()
                 + "\nNif: " + this.getNif()
-                + "\nEmail: " + getEmail());
+                + "\nEmail: " + getEmail();
     }
 }

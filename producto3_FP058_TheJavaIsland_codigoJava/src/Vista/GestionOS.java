@@ -2,6 +2,8 @@ package Vista;
 
 import Controlador.Controlador;
 import Modelo.*;
+import Modelo.DAO.ArticuloDAO;
+import Modelo.DAO.ArticuloDAOImpl;
 
 
 import java.time.LocalDateTime;
@@ -17,6 +19,9 @@ public class GestionOS {
     }
 
     public void Inicio() {
+        ArticuloDAO adao = new ArticuloDAOImpl();
+        Articulo a = adao.findById(1);
+        System.out.println(a.getDescripcion());
         boolean salir = false;
         char opcio;
         do {

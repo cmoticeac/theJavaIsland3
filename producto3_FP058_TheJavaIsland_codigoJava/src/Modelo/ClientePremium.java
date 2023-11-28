@@ -23,11 +23,11 @@ public class ClientePremium extends Cliente{
 
 
     //toString()
-    public void ToString(){
-        System.out.println("Cliente Premium"
+    public String ToString(){
+        return "Cliente Premium"
                 + "\nNombre: " + this.getNombre()
                 + "\nDireccion: " + this.getDomicilio()
                 + "\nNif: " + this.getNif()
-                + "\nEmail: " + getEmail());
+                + "\nEmail: " + getEmail();
     }
 }
