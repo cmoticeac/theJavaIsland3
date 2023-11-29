@@ -2,17 +2,19 @@ package Vista;
 
 import Controlador.Controlador;
 import Modelo.*;
-import Modelo.DAO.ArticuloDAO;
-import Modelo.DAO.ArticuloDAOImpl;
-
-
+import Modelo.DAO.*;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.util.Scanner;
+
 public class GestionOS {
     private Controlador controlador;
     Scanner teclado = new Scanner(System.in);
     public GestionOS() {
-        controlador = new Controlador();
+        ArticuloDAO articuloDAO = new ArticuloDAOImpl();
+        ClienteDAO clienteDAO = new ClienteDAOImpl();
+        PedidoDAO pedidoDAO = new PedidoDAOImpl();
+        controlador = new Controlador(articuloDAO, clienteDAO, pedidoDAO);
     }
     public GestionOS(Controlador controlador) {
         this.controlador = controlador;
@@ -153,7 +155,7 @@ public class GestionOS {
         System.out.print("Introduce el NIF: ");
         String nif = teclado.nextLine();
         //Como lo usamos como identificador, primero comprobaremos que no haya sido usado
-        while (controlador.clienteExistente(nif) == true){
+        while (controlador.clienteExistente(nif) != null){
             System.out.println("\n¡Este cliente ya está registrado!");
             System.out.print("Introduce el NIF: ");
             nif = teclado.nextLine();
@@ -389,8 +391,3 @@ public class GestionOS {
             System.out.println("-----------------------------------------------");
         }
 }
-
-
-
-
-

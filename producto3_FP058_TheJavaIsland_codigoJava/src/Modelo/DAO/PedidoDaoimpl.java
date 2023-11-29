@@ -69,9 +69,9 @@ public class PedidoDAOImpl implements PedidoDAO {
 
 
     @Override
-    public List<Pedido> readAll() {
+    public ArrayList<Pedido> readAll() {
         Connection conexion = getConecction();
-        List<Pedido> pedidos = new ArrayList<>();
+        ArrayList<Pedido> pedidos = new ArrayList<>();
         String query = "SELECT * FROM Pedidos";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();

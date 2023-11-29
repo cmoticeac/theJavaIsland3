@@ -1,7 +1,7 @@
 package Modelo.DAO;
 import Modelo.Pedido;
 import java.sql.Connection;
-import java.util.List;
+import java.util.*;
 
 public interface PedidoDAO {
     private Connection getConecction(){
@@ -9,7 +9,7 @@ public interface PedidoDAO {
     }
     void insert(Pedido pedido);
 
-    List<Pedido> readAll();
+    ArrayList<Pedido> readAll();
 
     Pedido findById(int numeroPedido);
 

@@ -1,140 +1,163 @@
 package Controlador;
-
-
 import Modelo.*;
-
+import Modelo.DAO.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
 
 
 public class Controlador {
 
     //Atributos
-    public Datos datos;
+    private ArticuloDAO articuloDAO;
+    private ClienteDAO clienteDAO;
+    private PedidoDAO pedidoDAO;
 
     //Contructor
-    public Controlador(){
-        datos = new Datos();
+    public Controlador(ArticuloDAO articuloDAO, ClienteDAO clienteDAO, PedidoDAO pedidoDAO) {
+        this.articuloDAO = articuloDAO;
+        this.clienteDAO = clienteDAO;
+        this.pedidoDAO = pedidoDAO;
     }
 
-    //Getter y Setter
-    public void setDatos(Datos datos) {this.datos = datos;}
-    public Datos getDatos(){return datos;}
+    public ArticuloDAO getArticuloDAO() {
+        return articuloDAO;
+    }
+
+    public void setArticuloDAO(ArticuloDAO articuloDAO) {
+        this.articuloDAO = articuloDAO;
+    }
+
+    public ClienteDAO getClienteDAO() {
+        return clienteDAO;
+    }
+
+    public void setClienteDAO(ClienteDAO clienteDAO) {
+        this.clienteDAO = clienteDAO;
+    }
+
+    public PedidoDAO getPedidoDAO() {
+        return pedidoDAO;
+    }
+
+    public void setPedidoDAO(PedidoDAO pedidoDAO) {
+        this.pedidoDAO = pedidoDAO;
+    }
+
 
     //Metodos
-    public void actualizarEnvios(){
-        for(Pedido p: this.datos.getListaPedidos().getLista()){
+    public void actualizarEnvios() {
+        // Obtener la lista de pedidos desde la base de datos
+        ArrayList<Pedido> pedidos = pedidoDAO.readAll();
+        for (Pedido p : pedidos) {
             Duration diferencia = Duration.between(p.getFechaHora(), LocalDateTime.now());
             double segundos = diferencia.getSeconds();
-            if ((p.getArticulo().getTiempoDePreparacion() * p.getCantidadArticulos()) < segundos){
+            if ((p.getArticulo().getTiempoDePreparacion() * p.getCantidadArticulos()) < segundos) {
                 p.setEnviado(true);
+                // Actualizar el estado del pedido en la base de datos
+                pedidoDAO.update(p);
             }
         }
     }
-
-    public void añadirArticulo(Articulo articulo){
-        this.datos.getListaArticulos().add(articulo);
+    public void añadirArticulo(Articulo articulo) {
+        // Insertar el artículo en la base de datos
+        articuloDAO.insert(articulo);
+    }
+    public Boolean clienteExistente(String nif) {
+        // Verificar si el cliente existe en la base de datos
+        return clienteDAO.findById(id);
     }
 
-    public Boolean clienteExistente(String nif){
-        for(int i = 0;i < this.datos.getListaClientes().getSize(); ++i){
-            if(this.datos.getListaClientes().getAt(i).getNif().equals(nif)){
-                return true;
-            }
+    public void añadirCliente(Cliente cliente) {
+        // Insertar el cliente en la base de datos
+        clienteDAO.insert(cliente);
+    }
+
+    public Cliente conseguirClienteNif(String nif) {
+        // Obtener el cliente por su NIF desde la base de datos
+        return clienteDAO.findById(nif);
+    }
+
+    public String imprimirArticulos() {
+        // Obtener la lista de artículos desde la base de datos
+        ArrayList<Articulo> articulos = articuloDAO.readAll();
+
+        StringBuilder result = new StringBuilder();
+        for (Articulo art : articulos) {
+            result.append(art.getCodigo()).append(" ").append(art.getDescripcion()).append(" ").append(art.getPrecioDeVenta()).append("€\n");
+        }
+        return result.toString();
+    }
+    public Articulo obtenerArticuloCodigo(String codigo) {
+        // Obtener el artículo por su código desde la base de datos
+        return articuloDAO.findById();
+    }
+
+    public String imprimirClientes() {
+        // Obtener la lista de clientes desde la base de datos
+        ArrayList<Cliente> clientes = clienteDAO.readAll();
+
+        StringBuilder result = new StringBuilder();
+        for (Cliente cl : clientes) {
+            result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+        }
+        return result.toString();
+    }
+
+    public String imprimirClientesPremium() {
+        // Obtener la lista de clientes premium desde la base de datos
+        ArrayList<Cliente> clientesPremium = clienteDAO.readAll();
+
+        StringBuilder result = new StringBuilder();
+        for (Cliente cl : clientesPremium) {
+            result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+        }
+        return result.toString();
+    }
+
+    public String imprimirClientesEstandar() {
+        // Obtener la lista de clientes estándar desde la base de datos
+        ArrayList<Cliente> clientesEstandar = clienteDAO.readAll();
+
+        StringBuilder result = new StringBuilder();
+        for (Cliente cl : clientesEstandar) {
+            result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+        }
+        return result.toString();
+    }
+
+    public void añadirPedido(Pedido pedido) {
+        // Insertar el pedido en la base de datos
+        pedidoDAO.insert(pedido);
+    }
+    public boolean eliminarPedido(int codigo) {
+        Pedido pedido = pedidoDAO.findById(int numeroPedido);
+        if (pedido != null && !pedido.getEnviado()) {
+            pedidoDAO.delete(pedido);
+            return true;
         }
         return false;
     }
+    public String obtenerPedidosPendientes() {
+        // Obtener la lista de pedidos pendientes desde la base de datos
+        ArrayList<Pedido> pedidosPendientes = pedidoDAO.readAll();
 
-    public void añadirCliente(Cliente cliente){
-        this.datos.getListaClientes().add(cliente);
+        StringBuilder result = new StringBuilder();
+        for (Pedido p : pedidosPendientes) {
+            if (!p.getEnviado()) result.append(p.getNumeroPedido()).append(" ").append(p.getPrecioTotal()).append("\n");
+        }
+        return result.toString();
     }
+    public String obtenerPediosEnviados() {
+        // Obtener la lista de pedidos enviados desde la base de datos
+        ArrayList<Pedido> pedidosEnviados = pedidoDAO.readAll();
 
-    public Cliente conseguirClienteNif(String nif){
-        for (Cliente cl: this.datos.getListaClientes().getLista()){
-            if(cl.getNif().equals(nif)){
-                return cl;
-            }
+        StringBuilder result = new StringBuilder();
+        for (Pedido p : pedidosEnviados) {
+            if (p.getEnviado()) result.append(p.getNumeroPedido()).append(" ").append(p.getPrecioTotal()).append("\n");
         }
-        return null;
-    }
-
-    public String imprimirArticulos(){
-        String articulos = new String();
-        for(Articulo art: this.datos.getListaArticulos().getLista()){
-            articulos += art.getCodigo() + " " + art.getDescripcion() + " " + art.getPrecioDeVenta() + "€\n";
-        }
-        return articulos;
-    }
-    public Articulo obtenerArticuloCodigo(String codigo){
-        for(Articulo art:this.datos.getListaArticulos().getLista()){
-            if(art.getCodigo().equals(codigo)){
-                return art;
-            }
-        }
-        return null;
+        return result.toString();
     }
 
-    public String imprimirClientes(){
-        String clientes = new String();
-        for(Cliente cl: this.datos.getListaClientes().getLista()){
-            clientes += cl.getNif() + " " + cl.getNombre() + "\n";
-        }
-        return clientes;
-    }
-
-    public String imprimirClientesPremium(){
-        String clientes = new String();
-        for(Cliente cl: this.datos.getListaClientes().getLista()){
-            if(cl instanceof ClientePremium)
-            clientes += cl.getNif() + " " + cl.getNombre() + "\n";
-        }
-        return clientes;
-    }
-    public String imprimirClientesEstandar(){
-        String clientes = new String();
-        for(Cliente cl: this.datos.getListaClientes().getLista()){
-            if(cl instanceof ClienteEstandar)
-                clientes += cl.getNif() + " " + cl.getNombre() + "\n";
-        }
-        return clientes;
-    }
-
-    public void añadirPedido(Pedido pedido){
-        this.datos.getListaPedidos().add(pedido);
-    }
-
-    //false => no se ha podido borrar
-    //true => borrado
-    public Boolean eliminarPedido(int codigo){
-        for (Pedido p: this.datos.getListaPedidos().getLista()){
-            if(p.getNumeroPedido() == codigo){
-                if(p.getEnviado()){
-                    return false;
-                }
-                else{
-                    this.datos.getListaPedidos().borrar(p);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public String obtenerPedidosPendientes(){
-        String pedidos = new String();
-        for (Pedido p:this.datos.getListaPedidos().getLista()){
-            if(p.getEnviado() == false) pedidos += p.getNumeroPedido() + " " + p.getPrecioTotal() + "\n";
-        }
-        return pedidos;
-    }
-
-    public String obtenerPediosEnviados(){
-        String pedidos = new String();
-        for (Pedido p:this.datos.getListaPedidos().getLista()){
-            if(p.getEnviado()) pedidos += p.getNumeroPedido() + " " + p.getPrecioTotal() + "\n";
-        }
-        return pedidos;
-    }
 }

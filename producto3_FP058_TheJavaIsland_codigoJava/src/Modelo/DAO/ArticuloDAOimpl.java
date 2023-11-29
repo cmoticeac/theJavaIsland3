@@ -57,9 +57,9 @@ public class ArticuloDAOImpl implements ArticuloDAO {
 
 
     @Override
-    public List<Articulo> readAll() {
+    public ArrayList<Articulo> readAll() {
         Connection conexion = getConecction();
-        List<Articulo> articulos = new ArrayList<>();
+        ArrayList<Articulo> articulos = new ArrayList<>();
         String query = "SELECT * FROM articulos";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
