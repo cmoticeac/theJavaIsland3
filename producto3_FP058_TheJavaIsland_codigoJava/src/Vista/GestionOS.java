@@ -155,7 +155,7 @@ public class GestionOS {
         System.out.print("Introduce el NIF: ");
         String nif = teclado.nextLine();
         //Como lo usamos como identificador, primero comprobaremos que no haya sido usado
-        while (controlador.clienteExistente(nif) != null){
+        while (controlador.clienteExistente(nif)) {
             System.out.println("\n¡Este cliente ya está registrado!");
             System.out.print("Introduce el NIF: ");
             nif = teclado.nextLine();

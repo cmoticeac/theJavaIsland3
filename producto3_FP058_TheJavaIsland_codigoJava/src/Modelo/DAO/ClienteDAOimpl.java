@@ -1,5 +1,7 @@
 package Modelo.DAO;
 import Modelo.Cliente;
+import Modelo.ClienteEstandar;
+import Modelo.ClientePremium;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -79,21 +81,24 @@ public class ClienteDAOImpl implements ClienteDAO {
     public ArrayList<Modelo.Cliente> readAll() {
         Connection conexion = getConecction();
         ArrayList<Cliente> clientes = new ArrayList<>();
-        String query = "SELECT * FROM clientes";
+        String query = "SELECT * FROM cliente";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Modelo.Cliente cliente = null;
-                cliente.setNombre(resultSet.getString("Nombre"));
-                cliente.setDomicilio(resultSet.getString("Domicilio"));
-                cliente.setNif(resultSet.getString("Nif"));
-                cliente.setEmail(resultSet.getString("Email"));
                 if (resultSet.getBoolean("TipoCliente") == false){
-                    Modelo.ClienteEstandar ce = (Modelo.ClienteEstandar) cliente;
+                    Modelo.ClienteEstandar ce = new ClienteEstandar();
+                    ce.setNombre(resultSet.getString("Nombre"));
+                    ce.setDomicilio(resultSet.getString("Domicilio"));
+                    ce.setNif(resultSet.getString("NIF"));
+                    ce.setEmail(resultSet.getString("Email"));
                     clientes.add(ce);
                 }
                 else{
-                    Modelo.ClientePremium cp = (Modelo.ClientePremium) cliente;
+                    Modelo.ClientePremium cp = new ClientePremium();
+                    cp.setNombre(resultSet.getString("Nombre"));
+                    cp.setDomicilio(resultSet.getString("Domicilio"));
+                    cp.setNif(resultSet.getString("NIF"));
+                    cp.setEmail(resultSet.getString("Email"));
                     cp.setCuota(resultSet.getDouble("CuotaMensual"));
                     cp.setDescuentoEnvio(resultSet.getDouble("Descuento"));
                     clientes.add(cp);
@@ -107,22 +112,22 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     public Modelo.Cliente findById(String id) {
         Connection conexion = getConecction();
-        String query = "SELECT * FROM clientes WHERE id = ?";
+        String query = "SELECT * FROM cliente WHERE NIF = ?";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setString(1, (id));
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                Modelo.Cliente cliente = null;
-                cliente.setNombre(resultSet.getString("nombre"));
-                cliente.setDomicilio(resultSet.getString("domicilio"));
-                cliente.setNif(resultSet.getString("nif"));
-                cliente.setEmail(resultSet.getString("email"));
                 if (resultSet.getBoolean("TipoCliente") == false){
-                    Modelo.ClienteEstandar ce = (Modelo.ClienteEstandar) cliente;
+                    Modelo.ClienteEstandar ce = new ClienteEstandar();
+                    ce.setNombre(resultSet.getString("Nombre"));
+                    ce.setDomicilio(resultSet.getString("Domicilio"));
+                    ce.setEmail(resultSet.getString("Email"));
                     return ce;
-                }
-                else{
-                    Modelo.ClientePremium cp = (Modelo.ClientePremium) cliente;
+                } else{
+                    Modelo.ClientePremium cp = new ClientePremium();
+                    cp.setNombre(resultSet.getString("Nombre"));
+                    cp.setDomicilio(resultSet.getString("Domicilio"));
+                    cp.setEmail(resultSet.getString("Email"));
                     cp.setCuota(resultSet.getDouble("CuotaMensual"));
                     cp.setDescuentoEnvio(resultSet.getDouble("Descuento"));
                     return cp;
@@ -141,13 +146,11 @@ public class ClienteDAOImpl implements ClienteDAO {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
-            String query = "UPDATE clientes SET nombre = ?, domicilio = ?, nif = ?, email = ? WHERE id = ?";
+            String query = "UPDATE cliente SET Nombre = ?, Domicilio = ?, Email = ? WHERE NIF = ?";
             try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
                 preparedStatement.setString(1, cliente.getNombre());
                 preparedStatement.setString(2, cliente.getDomicilio());
-                preparedStatement.setString(3, cliente.getNif());
                 preparedStatement.setString(4, cliente.getEmail());
-                preparedStatement.setString(5, cliente.getNif());
 
                 preparedStatement.executeUpdate();
             }

@@ -13,7 +13,7 @@ public class ClientePremium extends Cliente{
         this.descuentoEnvio = desc;
         this.cuota = c;
     }
-
+    public ClientePremium() {}
     //Setters i getters
     public double getCuota() {return this.cuota;}
     public double getDescuentoEnvio(){return this.descuentoEnvio;}

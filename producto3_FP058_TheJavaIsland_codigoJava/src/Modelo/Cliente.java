@@ -16,7 +16,7 @@ public abstract class Cliente {
         this.Nif = nif;
         this.Email = m;
     }
-
+    public Cliente(){}
     //Setters y getters
     public String getNombre() {return Nombre;}
 

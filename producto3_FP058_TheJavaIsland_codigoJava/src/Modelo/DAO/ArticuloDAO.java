@@ -9,7 +9,7 @@ public interface ArticuloDAO {
 
     ArrayList<Articulo> readAll();
 
-    Articulo findById(String id);
+    Articulo findById(int id);
 
     void update(Articulo articulo);
 }

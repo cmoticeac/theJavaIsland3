@@ -64,10 +64,12 @@ public class Controlador {
         // Insertar el artículo en la base de datos
         articuloDAO.insert(articulo);
     }
-    public Boolean clienteExistente(String nif) {
+    public boolean clienteExistente(String nif) {
         // Verificar si el cliente existe en la base de datos
-        return clienteDAO.findById(nif);
+        Cliente cliente = clienteDAO.findById(nif);
+        return cliente != null; // Retorna true si el cliente existe, false si no existe
     }
+
 
     public void añadirCliente(Cliente cliente) {
         // Insertar el cliente en la base de datos
@@ -91,7 +93,7 @@ public class Controlador {
     }
     public Articulo obtenerArticuloCodigo(String codigo) {
         // Obtener el artículo por su código desde la base de datos
-        return articuloDAO.findById(codigo);
+        return articuloDAO.findById(Integer.parseInt(codigo));
     }
 
     public String imprimirClientes() {
@@ -111,7 +113,9 @@ public class Controlador {
 
         StringBuilder result = new StringBuilder();
         for (Cliente cl : clientesPremium) {
-            result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+            if (cl instanceof ClientePremium) {
+                result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+            }
         }
         return result.toString();
     }
@@ -122,7 +126,9 @@ public class Controlador {
 
         StringBuilder result = new StringBuilder();
         for (Cliente cl : clientesEstandar) {
-            result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+            if (cl instanceof ClienteEstandar) {
+                result.append(cl.getNif()).append(" ").append(cl.getNombre()).append("\n");
+            }
         }
         return result.toString();
     }
