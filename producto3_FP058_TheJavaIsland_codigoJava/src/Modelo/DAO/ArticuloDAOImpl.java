@@ -1,7 +1,5 @@
 package Modelo.DAO;
-
 import Modelo.Articulo;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +9,6 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     private Connection getConecction(){
         return thejavaislandConnection.getConnection();
     }
-
-
 
     @Override
     public void insert(Articulo articulo) {
