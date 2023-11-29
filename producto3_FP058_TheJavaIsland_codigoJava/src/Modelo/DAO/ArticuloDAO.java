@@ -2,7 +2,6 @@ package Modelo.DAO;
 
 import Modelo.Articulo;
 import java.util.*;
-import java.util.List;
 
 public interface ArticuloDAO {
 
@@ -10,7 +9,7 @@ public interface ArticuloDAO {
 
     ArrayList<Articulo> readAll();
 
-    Articulo findById(int id);
+    Articulo findById(String id);
 
     void update(Articulo articulo);
 }

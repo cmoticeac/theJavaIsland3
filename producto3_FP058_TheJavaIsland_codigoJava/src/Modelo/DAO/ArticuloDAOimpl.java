@@ -2,7 +2,6 @@ package Modelo.DAO;
 import Modelo.Articulo;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ArticuloDAOImpl implements ArticuloDAO {
 
@@ -80,7 +79,7 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     }
 
     @Override
-    public Articulo findById(int id) {
+    public Articulo findById(String id) {
         Connection conexion = getConecction();
         String query = "SELECT * FROM Articulo WHERE Id = ?";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {

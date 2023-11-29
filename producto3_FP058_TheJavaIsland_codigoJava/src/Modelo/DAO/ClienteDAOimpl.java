@@ -6,9 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.*;
 public class ClienteDAOImpl implements ClienteDAO {
 
     private Connection getConecction(){
@@ -78,9 +76,9 @@ public class ClienteDAOImpl implements ClienteDAO {
     }
 
     @Override
-    public List<Modelo.Cliente> readAll() {
+    public ArrayList<Modelo.Cliente> readAll() {
         Connection conexion = getConecction();
-        List<Cliente> clientes = new ArrayList<>();
+        ArrayList<Cliente> clientes = new ArrayList<>();
         String query = "SELECT * FROM clientes";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -107,7 +105,7 @@ public class ClienteDAOImpl implements ClienteDAO {
         return clientes;
     }
 
-    public Modelo.Cliente findById(int id) {
+    public Modelo.Cliente findById(String id) {
         Connection conexion = getConecction();
         String query = "SELECT * FROM clientes WHERE id = ?";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {

@@ -183,4 +183,14 @@ public class PedidoDAOImpl implements PedidoDAO {
             }
         }
     }
+    public void delete(int numeroPedido) {
+        Connection conexion = getConecction();
+        String query = "DELETE FROM pedidos WHERE numeroPedido = ?";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            preparedStatement.setInt(1, numeroPedido);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

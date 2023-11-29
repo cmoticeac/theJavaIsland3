@@ -14,4 +14,5 @@ public interface PedidoDAO {
     Pedido findById(int numeroPedido);
 
     void update(Pedido pedido);
+    void delete(int numeroPedido);
 }

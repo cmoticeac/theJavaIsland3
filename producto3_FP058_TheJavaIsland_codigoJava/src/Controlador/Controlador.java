@@ -66,7 +66,7 @@ public class Controlador {
     }
     public Boolean clienteExistente(String nif) {
         // Verificar si el cliente existe en la base de datos
-        return clienteDAO.findById(id);
+        return clienteDAO.findById(nif);
     }
 
     public void añadirCliente(Cliente cliente) {
@@ -91,7 +91,7 @@ public class Controlador {
     }
     public Articulo obtenerArticuloCodigo(String codigo) {
         // Obtener el artículo por su código desde la base de datos
-        return articuloDAO.findById();
+        return articuloDAO.findById(codigo);
     }
 
     public String imprimirClientes() {
@@ -132,13 +132,14 @@ public class Controlador {
         pedidoDAO.insert(pedido);
     }
     public boolean eliminarPedido(int codigo) {
-        Pedido pedido = pedidoDAO.findById(int numeroPedido);
+        Pedido pedido = pedidoDAO.findById(codigo);
         if (pedido != null && !pedido.getEnviado()) {
-            pedidoDAO.delete(pedido);
+            pedidoDAO.delete(codigo);
             return true;
         }
         return false;
     }
+
     public String obtenerPedidosPendientes() {
         // Obtener la lista de pedidos pendientes desde la base de datos
         ArrayList<Pedido> pedidosPendientes = pedidoDAO.readAll();

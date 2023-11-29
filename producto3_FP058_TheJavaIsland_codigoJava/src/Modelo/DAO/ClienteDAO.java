@@ -1,14 +1,14 @@
 package Modelo.DAO;
 import Modelo.Cliente;
-import java.util.List;
+import java.util.*;
 
 public interface ClienteDAO {
 
     void insert(Cliente cliente);
 
-    List<Cliente> readAll();
+    ArrayList<Cliente> readAll();
 
-    Cliente findById(int id);
+    Cliente findById(String id);
 
     void update(Cliente cliente);
 }
