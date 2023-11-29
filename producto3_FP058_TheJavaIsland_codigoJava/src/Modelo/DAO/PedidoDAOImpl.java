@@ -1,5 +1,7 @@
 package Modelo.DAO;
+import Modelo.Articulo;
 import Modelo.Pedido;
+import Modelo.ClienteEstandar;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
@@ -8,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PedidoDAOImpl implements PedidoDAO {
 
@@ -72,20 +75,22 @@ public class PedidoDAOImpl implements PedidoDAO {
     public ArrayList<Pedido> readAll() {
         Connection conexion = getConecction();
         ArrayList<Pedido> pedidos = new ArrayList<>();
-        String query = "SELECT * FROM Pedidos";
+        ClienteEstandar cliente = new ClienteEstandar();
+        Articulo articulo = new Articulo();
+        String query = "SELECT * FROM pedido";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Pedido pedido = new Pedido(
                         resultSet.getInt("NumeroPedido"),
-                        null, // Cliente
-                        null, // Articulo
-                        resultSet.getInt("CantidadArticulos"),
+                        cliente,
+                        articulo,
+                        resultSet.getInt("CantidadArticulo"),
                         resultSet.getObject("FechaHora", LocalDateTime.class),
                         resultSet.getDouble("PrecioTotal"),
                         resultSet.getBoolean("Enviado")
                 );
-                pedido.getCliente().setNif(resultSet.getString("NifCliente"));
+                pedido.getCliente().setNif(resultSet.getString("IdCliente"));
                 pedido.getArticulo().setCodigo(resultSet.getString("IdArticulo"));
                 pedidos.add(pedido);
             }
@@ -98,21 +103,23 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public Pedido findById(int numeroPedido) {
         Connection conexion = getConecction();
-        String query = "SELECT * FROM pedidos WHERE numeroPedido = ?";
+        ClienteEstandar cliente = new ClienteEstandar();
+        Articulo articulo = new Articulo();
+        String query = "SELECT * FROM pedido WHERE NumeroPedido = ?";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setInt(1, numeroPedido);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 Pedido pedido = new Pedido(
                         resultSet.getInt("NumeroPedido"),
-                        null, // Cliente
-                        null, // Articulo
-                        resultSet.getInt("CantidadArticulos"),
+                        cliente,
+                        articulo,
+                        resultSet.getInt("CantidadArticulo"),
                         resultSet.getObject("FechaHora", LocalDateTime.class),
                         resultSet.getDouble("PrecioTotal"),
                         resultSet.getBoolean("Enviado")
                 );
-                pedido.getCliente().setNif(resultSet.getString("Nif"));
+                pedido.getCliente().setNif(resultSet.getString("IdCliente"));
                 pedido.getArticulo().setCodigo(resultSet.getString("IdArticulo"));
                 return pedido;
             }
@@ -130,7 +137,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
-            String query = "UPDATE pedidos SET IdCliente = ?, CodigoArticulo = ?, CantidadArticulos = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE numeroPedido = ?";
+            String query = "UPDATE pedido SET IdCliente = ?, IdArticulo = ?, CantidadArticulo = ?, FechaHora = ?, PrecioTotal = ?, Enviado = ? WHERE NumeroPedido = ?";
             preparedStatement = conexion.prepareStatement(query);
 
             preparedStatement.setString(1, pedido.getCliente().getNif());
@@ -181,6 +188,16 @@ public class PedidoDAOImpl implements PedidoDAO {
             } catch (SQLException closeException) {
                 closeException.printStackTrace();
             }
+        }
+    }
+    public void delete(int numeroPedido) {
+        Connection conexion = getConecction();
+        String query = "DELETE FROM pedido WHERE NumeroPedido = ?";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            preparedStatement.setInt(1, numeroPedido);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

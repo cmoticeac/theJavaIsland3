@@ -2,7 +2,6 @@ package Modelo.DAO;
 import Modelo.Articulo;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ArticuloDAOImpl implements ArticuloDAO {
 
@@ -60,12 +59,12 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     public ArrayList<Articulo> readAll() {
         Connection conexion = getConecction();
         ArrayList<Articulo> articulos = new ArrayList<>();
-        String query = "SELECT * FROM articulos";
+        String query = "SELECT * FROM articulo";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Articulo articulo = new Articulo(
-                        resultSet.getString("Codigo"),
+                        resultSet.getString("Id"),
                         resultSet.getString("Descripcion"),
                         resultSet.getDouble("PrecioDeVenta"),
                         resultSet.getDouble("GastosDeEnvio"),
@@ -82,7 +81,7 @@ public class ArticuloDAOImpl implements ArticuloDAO {
     @Override
     public Articulo findById(int id) {
         Connection conexion = getConecction();
-        String query = "SELECT * FROM Articulo WHERE Id = ?";
+        String query = "SELECT * FROM articulo WHERE Id = ?";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -109,7 +108,7 @@ public class ArticuloDAOImpl implements ArticuloDAO {
             // Iniciar la transacción
             conexion.setAutoCommit(false);
 
-            String query = "UPDATE articulos SET Descripcion = ?, PrecioDeVenta = ?, GastosDeEnvio = ?, TiempoDePreparacion = ? WHERE Codigo = ?";
+            String query = "UPDATE articulo SET Descripcion = ?, PrecioDeVenta = ?, GastosDeEnvio = ?, TiempoDePreparacion = ? WHERE Id = ?";
             try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
                 preparedStatement.setString(1, articulo.getDescripcion());
                 preparedStatement.setDouble(2, articulo.getPrecioDeVenta());
